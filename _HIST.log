@@ -1,5 +1,43 @@
 
 
+@(fix) 참조 사이트
+    + https://mycodings.fly.dev/
+        - https://mycodings.fly.dev/blog/2023-06-01-nextauth-tutorial-2-prisma/
+        - https://mycodings.fly.dev/blog/2023-06-01-nextauth-tutorial-2-prisma/
+        - https://mycodings.fly.dev/blog/2023-06-03-nextauth-nextjs-signin-signout-howto/
+        - https://mycodings.fly.dev/blog/2023-06-03-nextauth-nextjs-tutorial-protected-route-and-jwt-token/
+
+    + NextAuth.js 공식 문서: https://next-auth.js.org/getting-started/introduction
+
+#5. 기타 설치 및 설정 -----------------------------------------------------------------------------------------------------------------------
+
+    > npm install bcrypt : 비밀번호 해싱을 위한 라이브러리로, 사용자 인증 시스템에서 비밀번호를 안전하게 저장하기 위해 사용됩니다. Prisma와 함께 사용할 때, bcrypt를 사용하여 사용자 비밀번호를 해싱하고 검증할 수 있습니다. 
+
+#4. prisma 설치 및 설정 -----------------------------------------------------------------------------------------------------------------------
+
+    > npm i prisma ###--save-dev
+
+    > npx prisma init --datasource-provider sqlite ### npx prisma init
+
+      - prisma/schema.prisma 파일 수정 
+        (참고) https://www.prisma.io/docs/prisma-orm/quickstart/sqlite
+
+    > sqlite3 dev.db :: 확인
+
+    > npm install @prisma/client
+
+    >  npm install @auth/prisma-adapter :: next-auth에서 prisma adapter 사용하기 위함
+    
+    (참고) npx prisma db push, npx prisma db pull, npx prisma migrate dev 등 prisma 명령어 사용하여 데이터베이스 스키마 관리
+
+#3. redis 연결
+
+    - auth.ts에서 import Passkey from "next-auth/providers/passkey" 사용
+    - src/lib/redis.ts 파일 생성하여 Redis 연결 설정
+    - auth.ts에서 createStorage 함수에 redisDriver 설정 추가
+    - .env 파일에 REDIS_URL 설정 추가 (예: REDIS_URL=redis://:password@localhost:6379)
+    - (참고) redis는 docker로 실행
+
 #2. next-auth 설치 -----------------------------------------------------------------------------------------------------------------------
 
     C:\dev\ws-nextjs\rhkd-auth> npm i next-auth@beta

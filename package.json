@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.2",
     "@auth/unstorage-adapter": "^2.11.2",
+    "@libsql/client": "^0.17.2",
+    "@prisma/adapter-libsql": "^7.7.0",
+    "@prisma/client": "^7.7.0",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
+    "bcrypt": "^6.0.0",
     "ioredis": "^5.10.1",
     "next": "16.2.4",
     "next-auth": "^5.0.0-beta.31",
+    "prisma": "^7.7.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
