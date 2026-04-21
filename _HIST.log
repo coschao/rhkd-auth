@@ -1,0 +1,67 @@
+
+
+#2. next-auth 설치 -----------------------------------------------------------------------------------------------------------------------
+
+    C:\dev\ws-nextjs\rhkd-auth> npm i next-auth@beta
+
+    C:\dev\ws-nextjs\rhkd-auth> npx auth secret
+
+Need to install the following packages:
+auth@1.6.5
+Ok to proceed? (y) 
+
+Add the following to your .env file:
+# Auth Secret
+BETTER_AUTH_SECRET=84aabdb1a1b8a7cb958b655c78769b0397c2b0c791440669206922e6a5b7c1c8
+
+
+#1. create next app -----------------------------------------------------------------------------------------------------------------------
+
+PS C:\dev\ws-nextjs> npx create-next-app@latest
+√ What is your project named? ... rhkd-auth
+√ Would you like to use the recommended Next.js defaults? » No, customize settings
+√ Would you like to use TypeScript? ... No / Yes
+√ Which linter would you like to use? » ESLint
+√ Would you like to use React Compiler? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like your code inside a `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to customize the import alias (`@/*` by default)? ... No / Yes
+√ Would you like to include AGENTS.md to guide coding agents to write up-to-date Next.js code? ... No / Yes
+Creating a new Next.js app in C:\dev\ws-nextjs\rhkd-auth.
+
+Using npm.
+
+Initializing project with template: app-tw
+
+
+Installing dependencies:
+- next
+- react
+- react-dom
+
+Installing devDependencies:
+- @tailwindcss/postcss
+- @types/node
+- @types/react
+- @types/react-dom
+- eslint
+- eslint-config-next
+- tailwindcss
+- typescript
+
+
+added 358 packages, and audited 359 packages in 41s
+
+142 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+Generating route types...
+✓ Types generated successfully
+
+Initialized a git repository.
+
+Success! Created rhkd-auth at C:\dev\ws-nextjs\rhkd-auth
+
