@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import * as bcrypt from 'bcrypt'
+import { signJwtAccessToken } from '@/lib/jwt';
 
 interface RequestBody {
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -12,14 +13,15 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findFirst({
         where: {
-            email: body.username,
+            email: body.email,
         },
     })
 
     if (user && (await bcrypt.compare(body.password, user.password))) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...userWithoutPass } = user
-        return new Response(JSON.stringify(userWithoutPass))
+        const accessToken = signJwtAccessToken(userWithoutPass);
+        return new Response(JSON.stringify({ ...userWithoutPass, accessToken }))
     } 
     else {
         return new Response(JSON.stringify(null))

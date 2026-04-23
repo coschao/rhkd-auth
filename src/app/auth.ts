@@ -4,6 +4,8 @@ import Passkey from "next-auth/providers/passkey"
 import redisDriver from "unstorage/drivers/redis";
 import { createStorage } from "unstorage";
 import { UnstorageAdapter } from "@auth/unstorage-adapter";
+import { getUserByEmail } from '@/lib/dal/user';
+import * as bcrypt from 'bcrypt';
 
 const storage = createStorage({
     driver: redisDriver({
@@ -22,43 +24,49 @@ export const {
         CredentialsProvider({
             name: 'Credentials',
             credentials: {
-                username: { label: '이메일아이디', type: 'text', placeholder: 'username@example.com' },
+                email: { label: '이메일아이디', type: 'text', placeholder: 'userid@example.com' },
                 password: { label: '비밀번호', type: 'password' },
             },
-            async authorize(credentials, req) {
-                // Add logic here to look up the user from the credentials supplied
+            async authorize(credentials) {
                 console.log('[CP#authorize] credentials:', credentials);
-                console.log('[CP#authorize] request:', req);
-                // const user = { id: '1', name: 'J Smith', email: 'username@example.com' }
-                // if (user) {
-                //     debugger;
-                //     // Any object returned will be saved in `user` property of the JWT
-                //     return user
-                // }
-                // else {
-                //     // If you return null then an error will be displayed advising the user to check their details.
-                //     return null
-                //     // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
-                // }
-                const res = await fetch(`${process.env.NEXTAUTH_URL}/api/user/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    // body: JSON.stringify({
-                    //     username: credentials?.username,
-                    //     password: credentials?.password,
-                    // }),
-                    body: JSON.stringify(credentials),
-                })
-                const user = await res.json()
-                console.log('[CP#authorize] user:', user);
 
-                if (user) {
-                    return user
+                if (!credentials?.email || !credentials?.password) {
+                    console.log('[CP#authorize] Missing email or password');
+                    return null;
                 }
-                else {
-                    return null
+
+                try {
+                    const user = await getUserByEmail(credentials.email as string);
+
+                    console.log('[CP#authorize] user found in DB:', user ? 'Yes' : 'No');
+
+                    if (!user || !user.password) {
+                        console.log('[CP#authorize] User not found or no password');
+                        return null;
+                    }
+
+                    const isPasswordValid = await bcrypt.compare(
+                        credentials.password as string,
+                        user.password
+                    );
+
+                    console.log('[CP#authorize] password valid:', isPasswordValid);
+
+                    if (isPasswordValid) {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { password, ...userWithoutPass } = user;
+                        // Prisma id is Int, so convert to string for NextAuth compatibility
+                        return {
+                            ...userWithoutPass,
+                            id: userWithoutPass.id.toString(),
+                        };
+                    }
+
+                    return null;
+                }
+                catch (error) {
+                    console.error('[CP#authorize] error during authorize:', error);
+                    return null;
                 }
             },
         }),
@@ -67,7 +75,7 @@ export const {
                 email: {
                     label: "이메일",
                     required: true,
-                    autocomplete: "username webauthn",
+                    autocomplete: "email webauthn",
                 },
             },
         }),
@@ -75,21 +83,23 @@ export const {
 
     callbacks: {
         // [2] JWT 토큰에 사용자 정보 저장
-        async jwt({ token, user }) {
+        async jwt({ token, user }: { token: any; user?: any }) {
             if (user) {
                 token.email = user.email;
                 token.name = user.name;
                 token.id = user.id;
+                token.accessToken = user.accessToken; // JWT 토큰도 세션에 포함
                 // token.rolerole; // 추가적인 필드 저장
             }
             return token;
         },
         // [3] 클라이언트 세션에 토큰 정보 전달
-        async session({ session, token }) {
+        async session({ session, token }: { session: any; token: any }) {
             if (token) {
                 session.user.email = token.email;
                 session.user.name = token.name;
                 session.user.id = token.id;
+                session.user.accessToken = token.accessToken; // JWT 토큰도 세션에 포함
             }
             return session;
         },
@@ -98,7 +108,11 @@ export const {
         strategy: "jwt", // JWT 기반 세션 사용
     },
 
+    pages: {
+        signIn: '/login',
+    },
+
     experimental: { //Passkey는 아직 실험적 기능
         enableWebAuthn: true,
     },
-})
+}) //end of NextAuth
