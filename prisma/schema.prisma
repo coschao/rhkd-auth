@@ -15,6 +15,19 @@ model User {
   role      String   @default("STD_USER")
   createdAt DateTime @default(now()) @map("created_at")
   posts     Post[]
+  loginLog  UserLoginLog?
+}
+
+model UserLoginLog {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @unique @map("user_id")
+  user             User      @relation(fields: [userId], references: [id])
+  lastSignedInAt   DateTime  @default(now()) @map("last_signed_in_at")
+  lastSignedOutAt  DateTime? @map("last_signed_out_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime? @updatedAt @map("updated_at")
+
+  @@map("user_login_logs")
 }
 
 model Post {

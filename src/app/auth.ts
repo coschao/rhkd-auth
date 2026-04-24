@@ -4,8 +4,7 @@ import Passkey from "next-auth/providers/passkey"
 import redisDriver from "unstorage/drivers/redis";
 import { createStorage } from "unstorage";
 import { UnstorageAdapter } from "@auth/unstorage-adapter";
-import { getUserByEmail } from '@/lib/dal/user';
-import * as bcrypt from 'bcrypt';
+import { customAuthorize } from '@/lib/actions/server-auth';
 
 const storage = createStorage({
     driver: redisDriver({
@@ -28,46 +27,7 @@ export const {
                 password: { label: '비밀번호', type: 'password' },
             },
             async authorize(credentials) {
-                console.log('[CP#authorize] credentials:', credentials);
-
-                if (!credentials?.email || !credentials?.password) {
-                    console.log('[CP#authorize] Missing email or password');
-                    return null;
-                }
-
-                try {
-                    const user = await getUserByEmail(credentials.email as string);
-
-                    console.log('[CP#authorize] user found in DB:', user ? 'Yes' : 'No');
-
-                    if (!user || !user.password) {
-                        console.log('[CP#authorize] User not found or no password');
-                        return null;
-                    }
-
-                    const isPasswordValid = await bcrypt.compare(
-                        credentials.password as string,
-                        user.password
-                    );
-
-                    console.log('[CP#authorize] password valid:', isPasswordValid);
-
-                    if (isPasswordValid) {
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { password, ...userWithoutPass } = user;
-                        // Prisma id is Int, so convert to string for NextAuth compatibility
-                        return {
-                            ...userWithoutPass,
-                            id: userWithoutPass.id.toString(),
-                        };
-                    }
-
-                    return null;
-                }
-                catch (error) {
-                    console.error('[CP#authorize] error during authorize:', error);
-                    return null;
-                }
+                return await customAuthorize(credentials as Record<string, unknown>);
             },
         }),
         Passkey({

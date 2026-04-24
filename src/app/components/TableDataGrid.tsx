@@ -35,7 +35,7 @@ interface TableDataGridProps {
 }
 
 export default function TableDataGrid({ rowData }: TableDataGridProps) {
-    const [isFilterVisible, setIsFilterVisible] = React.useState(true);
+    const [isFilterVisible, setIsFilterVisible] = React.useState(false);
 
     // v33 Theming API를 사용한 테마 설정
     const myTheme = useMemo(() => {

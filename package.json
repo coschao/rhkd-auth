@@ -11,6 +11,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
     "@auth/unstorage-adapter": "^2.11.2",
+    "@headlessui/react": "^2.2.10",
     "@libsql/client": "^0.17.2",
     "@prisma/adapter-libsql": "^7.7.0",
     "@simplewebauthn/browser": "^9.0.1",
