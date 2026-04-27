@@ -8,24 +8,24 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int           @id @default(autoincrement())
+  email     String        @unique
   name      String?
   password  String
-  role      String   @default("STD_USER")
-  createdAt DateTime @default(now()) @map("created_at")
+  role      String        @default("STD_USER")
+  createdAt DateTime      @default(now()) @map("created_at")
   posts     Post[]
   loginLog  UserLoginLog?
 }
 
 model UserLoginLog {
-  id               Int       @id @default(autoincrement())
-  userId           Int       @unique @map("user_id")
-  user             User      @relation(fields: [userId], references: [id])
-  lastSignedInAt   DateTime  @default(now()) @map("last_signed_in_at")
-  lastSignedOutAt  DateTime? @map("last_signed_out_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime? @updatedAt @map("updated_at")
+  id              Int       @id @default(autoincrement())
+  userId          Int       @unique @map("user_id")
+  lastSignedInAt  DateTime  @default(now()) @map("last_signed_in_at")
+  lastSignedOutAt DateTime? @map("last_signed_out_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime? @updatedAt @map("updated_at")
+  user            User      @relation(fields: [userId], references: [id])
 
   @@map("user_login_logs")
 }
@@ -37,4 +37,36 @@ model Post {
   published Boolean @default(false)
   authorId  Int
   author    User    @relation(fields: [authorId], references: [id])
+}
+
+model CommonCode {
+  gcode      String
+  ccode      String
+  cname      String
+  sort       Int       @default(1)
+  attr1      String?
+  attr2      String?
+  attr3      String?
+  attr4      String?
+  attr5      String?
+  remark     String?
+  useYn      String    @default("Y") @map("use_yn")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime? @map("updated_at")
+  group      CommonCodeGroup @relation(fields: [gcode], references: [gcode])
+
+  @@id([gcode, ccode])
+  @@map("ccodes")
+}
+
+model CommonCodeGroup {
+  gcode      String    @id
+  gname      String
+  remark     String?
+  useYn      String    @default("Y") @map("use_yn")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime? @map("updated_at")
+  codes      CommonCode[]
+
+  @@map("cgroups")
 }
